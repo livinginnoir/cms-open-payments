@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Google credentials
+application_default_credentials.json
+
+# Environment variables
+.env
+
+# dbt
+dbt_cms/profiles.yml
+dbt_cms/target/
+dbt_cms/dbt_packages/
+logs/
