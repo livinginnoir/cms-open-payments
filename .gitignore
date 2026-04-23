@@ -14,3 +14,7 @@ dbt_cms/profiles.yml
 dbt_cms/target/
 dbt_cms/dbt_packages/
 logs/
+
+# Large data files
+*.csv
+*.zip
