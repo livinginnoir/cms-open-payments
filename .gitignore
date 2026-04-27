@@ -1,3 +1,5 @@
+.DS_Store
+
 # Python
 venv/
 __pycache__/
@@ -18,3 +20,4 @@ logs/
 # Large data files
 *.csv
 *.zip
+**/.DS_Store

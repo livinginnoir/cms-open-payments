@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw
+    database: project-4f698b69-289f-483f-b87
+    schema: raw
+    tables:
+      - name: general_payments_2024
