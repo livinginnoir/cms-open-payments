@@ -1,0 +1,175 @@
+# schema.yml
+# dbt tests and column documentation for all models
+# Located in: dbt_cms/tests/schema.yml
+
+version: 2
+
+models:
+
+  # -------------------------
+  # STAGING
+  # -------------------------
+  - name: stg_general_payments
+    description: "Staged CMS General Payments 2024. Renamed columns, cast types, trimmed strings, flagged nulls."
+    columns:
+      - name: record_id
+        description: "Primary key. Unique identifier for each payment record."
+        tests:
+          - not_null
+          - unique
+
+      - name: date_of_payment
+        description: "Date the payment was made."
+        tests:
+          - not_null
+
+      - name: program_year
+        description: "CMS program year the payment was reported under."
+        tests:
+          - not_null
+
+      - name: total_amount_of_payment_us_dollars
+        description: "Total payment amount in USD."
+        tests:
+          - not_null
+
+      - name: nature_of_payment_or_transfer_of_value
+        description: "CMS-defined category describing the nature of the payment."
+        tests:
+          - not_null
+
+      - name: recipient_state
+        description: "State of the recipient's primary business address."
+        tests:
+          - not_null
+
+      - name: recipient_city
+        description: "City of the recipient's primary business address."
+        tests:
+          - not_null
+
+  # -------------------------
+  # INTERMEDIATE
+  # -------------------------
+  - name: int_payments_enriched
+    description: "Enriched payments with standardized company name, derived primary specialty, and simplified recipient type."
+    columns:
+
+      - name: record_id
+        description: "Primary key. Carries through from staging."
+        tests:
+          - not_null
+          - unique
+
+      - name: date_of_payment
+        description: "Date the payment was made."
+        tests:
+          - not_null
+
+      - name: program_year
+        description: "CMS program year the payment was reported under."
+        tests:
+          - not_null
+
+      - name: total_amount_of_payment_us_dollars
+        description: "Total payment amount in USD."
+        tests:
+          - not_null
+
+      - name: nature_of_payment_or_transfer_of_value
+        description: "CMS-defined category describing the nature of the payment."
+        tests:
+          - not_null
+
+      - name: recipient_state
+        description: "State of the recipient's primary business address."
+        tests:
+          - not_null
+
+      - name: recipient_city
+        description: "City of the recipient's primary business address."
+        tests:
+          - not_null
+
+  # -------------------------
+  # MARTS
+  # -------------------------
+  - name: mart_payments_by_company
+    description: "Top 20 companies by total payments with nature of payment breakdown and YoY % change."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - company_name_standardized
+              - program_year
+    columns:
+
+      - name: company_name_standardized
+        description: "Composite primary key part 1. Standardized (uppercased) company name."
+        tests:
+          - not_null
+
+      - name: program_year
+        description: "Composite primary key part 2. Program year."
+        tests:
+          - not_null
+      
+      - name: total_payment_amount
+        description: "Total payment amount in USD for each company."
+        tests:
+          - not_null
+
+  - name: mart_payments_by_specialty
+    description: "Total and average payments by physician specialty."
+    columns:
+
+      - name: specialty_clean
+        description: "Primary specialty of physician."
+        tests:
+          - not_null
+          - unique
+      
+      - name: total_payment_amount
+        description: "Total payment amount in USD for each physician specialty."
+        tests:
+          - not_null
+      
+      - name: physician_count
+        description: "Total number of physicians per specialty."
+        tests:
+          - not_null
+
+      - name: avg_payment_per_physician
+        description: "Average payment by physician specialty."
+        tests:
+          - not_null
+
+  - name: mart_geo_summary
+    description: "Total payments by state with top 5 cities per state by payment volume."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - recipient_state
+              - recipient_city
+    columns:
+
+      - name: recipient_state
+        description: "Composite primary key part 1. State of recipient."
+        tests:
+          - not_null
+
+      - name: recipient_city
+        description: "Composite primary key part 2. City of recipient."
+        tests:
+          - not_null
+
+      - name: state_total_payment
+        description: "Total payment by state in USD."
+        tests:
+          - not_null
+      
+      - name: city_total_payment
+        description: "Total payment by city in USD."
+        tests:
+          - not_null
